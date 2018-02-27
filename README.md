@@ -6,7 +6,7 @@
 
 Install the library via NPM.
 
-```
+```bash
 npm install --save instacache
 ```
 
