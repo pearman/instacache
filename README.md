@@ -20,7 +20,7 @@ The cache is initialized simply with *key* and a *generator*. The *generator* is
 const instaCache = new InstaCache()
     .cache('markets', () =>
            this.http.get("http://api.bitcoincharts.com/v1/markets.json"))
-	.cache('prices', () =>
+    .cache('prices', () =>
            this.http.get("http://api.bitcoincharts.com/v1/weighted_prices.json"));
 ```
 
