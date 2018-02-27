@@ -2,6 +2,14 @@
 
 > A simple, async caching library powered by RxJS.
 
+### Installation
+
+Install the library via NPM.
+
+```
+npm install --save instacache
+```
+
 ### Initializing the Cache
 
 The cache is initialized simply with *key* and a *generator*. The *generator* is a lambda returning an Observable, Promise, or value. Internally the value yielded by the *generator* is converted to an Observable.
