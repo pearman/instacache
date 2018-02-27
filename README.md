@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/pearman/instacache.svg?branch=master)](https://travis-ci.org/pearman/instacache)
+
 # InstaCache
 
 > A simple, async caching library powered by RxJS.
