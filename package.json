@@ -2,7 +2,7 @@
   "name": "instacache",
   "version": "0.0.1",
   "description": "A simple async caching library powered by rxjs.",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
     "test": "npm run build && jest",

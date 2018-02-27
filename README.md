@@ -1,4 +1,4 @@
-## InstaCache
+# InstaCache
 
 > A simple, async caching library powered by RxJS.
 
