@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Observable_1 = require("rxjs/Observable");
 var lodash_1 = require("lodash");
 var operators_1 = require("rxjs/operators");
-var Subject_1 = require("rxjs/Subject");
 var fromPromise_1 = require("rxjs/observable/fromPromise");
+var ReplaySubject_1 = require("rxjs/ReplaySubject");
 function logErrorIf(condition, error) {
     if (condition)
         console.error('[instacache] ' + error);
@@ -15,12 +15,10 @@ var InstaCache = /** @class */ (function () {
     }
     InstaCache.prototype.cache = function (key, generator) {
         logErrorIf(!lodash_1.isFunction(generator), "generator for \"" + key + "\" must be a function: () => value | Promise | Observable");
-        var source = new Subject_1.Subject();
-        var out = source.pipe(operators_1.publishReplay(1), operators_1.refCount());
+        var source = new ReplaySubject_1.ReplaySubject(1);
         this.cacheEntries[key] = {
             generator: generator,
-            source: source,
-            out: out
+            source: source
         };
         this.refresh(key);
         return this;
@@ -29,7 +27,7 @@ var InstaCache = /** @class */ (function () {
         var entry = lodash_1.get(this.cacheEntries, key);
         // Create a fresh reference to prevent mutability bugs
         if (entry)
-            return entry.out;
+            return entry.source.pipe(operators_1.map(function (x) { return x; }));
         return undefined;
     };
     InstaCache.prototype.refresh = function (key) {

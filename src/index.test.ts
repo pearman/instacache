@@ -21,7 +21,7 @@ test('get of invalid key returns undefined', () => {
 
 test('cache observable', done => {
   const testCache = new InstaCache();
-  testCache.cache('observable', () => of(3).pipe(delay(10)));
+  testCache.cache('observable', () => of(3));
   testCache.get('observable').subscribe(result => {
     expect(result).toBe(3);
     done();

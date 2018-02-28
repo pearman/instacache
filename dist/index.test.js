@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = require("./index");
 var of_1 = require("rxjs/observable/of");
 var Observable_1 = require("rxjs/Observable");
-var operators_1 = require("rxjs/operators");
 test('get of valid key returns observable', function () {
     var testCache = new index_1.InstaCache();
     testCache.cache('value', function () { return 3; });
@@ -15,7 +14,7 @@ test('get of invalid key returns undefined', function () {
 });
 test('cache observable', function (done) {
     var testCache = new index_1.InstaCache();
-    testCache.cache('observable', function () { return of_1.of(3).pipe(operators_1.delay(10)); });
+    testCache.cache('observable', function () { return of_1.of(3); });
     testCache.get('observable').subscribe(function (result) {
         expect(result).toBe(3);
         done();

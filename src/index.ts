@@ -1,14 +1,12 @@
 import { Observable } from 'rxjs/Observable';
 import { get, isFunction } from 'lodash';
-import { mergeMap, publishReplay, refCount, take } from 'rxjs/operators';
-import { of as observableOf } from 'rxjs/observable/of';
-import { Subject } from 'rxjs/Subject';
+import { map, take } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/observable/fromPromise';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
 
 interface CacheEntry {
   generator: () => Observable<any>;
-  source: Subject<any>;
-  out: Observable<any>;
+  source: ReplaySubject<any>;
 }
 
 function logErrorIf(condition: boolean, error: string) {
@@ -24,12 +22,10 @@ export class InstaCache {
       `generator for "${key}" must be a function: () => value | Promise | Observable`
     );
 
-    const source = new Subject<any>();
-    const out = source.pipe(publishReplay(1), refCount());
+    const source = new ReplaySubject(1);
     this.cacheEntries[key] = {
       generator,
-      source,
-      out
+      source
     };
     this.refresh(key);
     return this;
@@ -38,7 +34,7 @@ export class InstaCache {
   public get(key: string): Observable<any> {
     const entry = <CacheEntry>get(this.cacheEntries, key);
     // Create a fresh reference to prevent mutability bugs
-    if (entry) return entry.out;
+    if (entry) return entry.source.pipe(map(x => x));
     return undefined;
   }
 
