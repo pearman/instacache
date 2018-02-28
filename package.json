@@ -1,6 +1,6 @@
 {
   "name": "instacache",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A simple async caching library powered by rxjs.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
