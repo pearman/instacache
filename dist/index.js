@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Observable_1 = require("rxjs/Observable");
 var lodash_1 = require("lodash");
 var operators_1 = require("rxjs/operators");
-var of_1 = require("rxjs/observable/of");
 var Subject_1 = require("rxjs/Subject");
 var fromPromise_1 = require("rxjs/observable/fromPromise");
 function logErrorIf(condition, error) {
@@ -30,7 +29,7 @@ var InstaCache = /** @class */ (function () {
         var entry = lodash_1.get(this.cacheEntries, key);
         // Create a fresh reference to prevent mutability bugs
         if (entry)
-            return of_1.of(null).pipe(operators_1.mergeMap(function (n) { return entry.out; }));
+            return entry.out;
         return undefined;
     };
     InstaCache.prototype.refresh = function (key) {

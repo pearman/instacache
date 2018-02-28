@@ -38,7 +38,7 @@ export class InstaCache {
   public get(key: string): Observable<any> {
     const entry = <CacheEntry>get(this.cacheEntries, key);
     // Create a fresh reference to prevent mutability bugs
-    if (entry) return observableOf(null).pipe(mergeMap(n => entry.out));
+    if (entry) return entry.out;
     return undefined;
   }
 
