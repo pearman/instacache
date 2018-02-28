@@ -3,6 +3,7 @@
   "version": "0.0.4",
   "description": "A simple async caching library powered by rxjs.",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "npm run build && jest",
