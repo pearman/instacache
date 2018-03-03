@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/pearman/instacache.svg?branch=master)](https://travis-ci.org/pearman/instacache)
+[![Build Status](https://travis-ci.org/pearman/instacache.svg?branch=master)](https://travis-ci.org/pearman/instacache) [![Coverage Status](https://coveralls.io/repos/github/pearman/instacache/badge.svg?branch=master)](https://coveralls.io/github/pearman/instacache?branch=master)
 
 # InstaCache
 
