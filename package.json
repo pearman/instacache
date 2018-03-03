@@ -15,6 +15,7 @@
     "test": "jest",
     "format": "prettier --single-quote --print-width 120 --write \"src/**/*.ts\"",
     "coverage": "jest --coverage",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "watch": "tsc --watch"
   },
   "author": "pearman",
@@ -30,7 +31,8 @@
       "jsx",
       "json",
       "node"
-    ]
+    ],
+    "collectCoverage": true
   },
   "license": "MIT",
   "dependencies": {
@@ -38,6 +40,7 @@
     "rxjs": "^5.5.6"
   },
   "devDependencies": {
+    "coveralls": "^3.0.0",
     "jest": "^22.4.2",
     "prettier": "^1.10.2",
     "ts-jest": "^22.4.1",
