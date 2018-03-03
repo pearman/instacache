@@ -2,15 +2,30 @@
   "name": "instacache",
   "version": "0.0.7",
   "description": "A simple async caching library powered by rxjs.",
+  "keywords": ["rxjs", "cache", "angular", "async"],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && jest",
+    "test": "jest",
     "format": "prettier --single-quote --print-width 120 --write \"src/**/*.ts\"",
     "watch": "tsc --watch"
   },
   "author": "pearman",
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  },
   "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.5",
@@ -19,6 +34,7 @@
   "devDependencies": {
     "jest": "^22.4.2",
     "prettier": "^1.10.2",
+    "ts-jest": "^22.4.1",
     "typescript": "^2.7.2"
   }
 }
