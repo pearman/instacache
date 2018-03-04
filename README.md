@@ -68,7 +68,21 @@ instaCache.refresh('markets').subscribe(console.log);
 To cache a fresh value in an existing entry use the `update` method. This will broadcast the new entry to all subscribers. Note that if `refresh` is called it will replace this value with whatever is supplied by the generator.
 
 ```typescript
-instCache.update('markets', someNewData);
+instaCache.update('markets', someNewData);
+```
+
+### Clearing Data
+
+To clear an entry use the `clear` method. This will send a complete event to each subscriber, ending their subscriptions.
+
+```typescript
+instaCache.clear('markets');
+```
+
+To clear everything, and complete all subscriptions use `clearAll`.
+
+```typescript
+instaCache.clearAll();
 ```
 
 ## Methods
@@ -95,5 +109,25 @@ refresh(key: string): Observable<any> | undefined
 ```typescript
 update(key: string, value: any): boolean
 ```
-`update` will cache and broadcast to all subscribers for a given `key`.
+`update` will cache and broadcast to all subscribers for a given `key`. `update` will return `true` if an entry was removed and `false` otherwise.
+
+### clear
+
+```typescript
+clear(key: string): boolean
+```
+
+`clear` will remove a key from the cache, sending a complete event to each subscriber (ending their subscriptions). `clear` will return `true` if an entry was removed and `false` otherwise.
+
+### clearAll
+
+```
+clearAll(): void 
+```
+
+`clearAll` will complete all subscriptions, for any key, and start fresh.
+
+
+
+
 

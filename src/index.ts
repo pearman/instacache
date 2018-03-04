@@ -70,7 +70,7 @@ export class InstaCache {
     return false;
   }
 
-  public clearAll() {
+  public clearAll(): void {
     forEach(this.cacheEntries, (entry, key) => this.clear(key));
   }
 
