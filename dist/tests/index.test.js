@@ -71,6 +71,38 @@ test('update pushs a new value to subscribers', function (done) {
     // After some time emit a fresh value
     setTimeout(function () { return testCache.update(key, 15); }, 100);
 });
+test('get subscription should complete on clear, clear should return true', function (done) {
+    var testCache = new index_1.InstaCache().cache('cool', function () { return 'cool'; });
+    testCache
+        .get('cool')
+        .pipe(operators_1.tap(function (data) {
+        expect(data).toBe('cool');
+        expect(testCache.clear('cool')).toBe(true);
+        expect(testCache.get('cool')).toBe(undefined);
+    }))
+        .subscribe(function (data) { }, function (err) { }, function () {
+        done();
+    });
+});
+test('get subscription should complete on clearAll', function (done) {
+    var testCache = new index_1.InstaCache()
+        .cache('cool', function () { return 'cool'; })
+        .cache('neat', function () { return 'neat'; });
+    testCache
+        .get('neat')
+        .pipe(operators_1.tap(function (data) {
+        expect(data).toBe('neat');
+        testCache.clearAll();
+        expect(testCache.get('neat')).toBe(undefined);
+        expect(testCache.get('cool')).toBe(undefined);
+    }))
+        .subscribe(function () { }, function () { }, function () { return done(); });
+});
+test('clearing a non-existing key should return false', function (done) {
+    var testCache = new index_1.InstaCache();
+    expect(testCache.clear('wow')).toBe(false);
+    done();
+});
 test('cache observable', function (done) {
     var testCache = new index_1.InstaCache();
     testCache.get('observable', function () { return of_1.of(3); }).subscribe(function (result) {

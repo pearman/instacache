@@ -5,6 +5,8 @@ export declare class InstaCache {
   get(key: string, miss?: () => any): Observable<any> | undefined;
   refresh(key: string): Observable<any> | undefined;
   update(key: string, value: any): boolean;
+  clear(key: string): boolean;
+  clearAll(): void;
   private _initialize(entry, key);
   private _toObservable(input);
 }

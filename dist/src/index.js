@@ -10,10 +10,9 @@ var InstaCache = /** @class */ (function () {
         this.cacheEntries = {};
     }
     InstaCache.prototype.cache = function (key, generator) {
-        var source = new ReplaySubject_1.ReplaySubject(1);
         this.cacheEntries[key] = {
             generator: generator,
-            source: source,
+            source: new ReplaySubject_1.ReplaySubject(1),
             initialized: false
         };
         return this;
@@ -47,6 +46,19 @@ var InstaCache = /** @class */ (function () {
             return true;
         }
         return false;
+    };
+    InstaCache.prototype.clear = function (key) {
+        var entry = lodash_1.get(this.cacheEntries, key);
+        if (entry) {
+            entry.source.complete();
+            lodash_1.unset(this.cacheEntries, key);
+            return true;
+        }
+        return false;
+    };
+    InstaCache.prototype.clearAll = function () {
+        var _this = this;
+        lodash_1.forEach(this.cacheEntries, function (entry, key) { return _this.clear(key); });
     };
     InstaCache.prototype._initialize = function (entry, key) {
         if (!entry.initialized) {
