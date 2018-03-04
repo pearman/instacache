@@ -86,6 +86,51 @@ test('update pushs a new value to subscribers', done => {
   setTimeout(() => testCache.update(key, 15), 100);
 });
 
+test('get subscription should complete on clear, clear should return true', done => {
+  const testCache = new InstaCache().cache('cool', () => 'cool');
+
+  testCache
+    .get('cool')
+    .pipe(
+      tap(data => {
+        expect(data).toBe('cool');
+        expect(testCache.clear('cool')).toBe(true);
+        expect(testCache.get('cool')).toBe(undefined);
+      })
+    )
+    .subscribe(
+      data => {},
+      err => {},
+      () => {
+        done();
+      }
+    );
+});
+
+test('get subscription should complete on clearAll', done => {
+  const testCache = new InstaCache()
+    .cache('cool', () => 'cool')
+    .cache('neat', () => 'neat');
+
+  testCache
+    .get('neat')
+    .pipe(
+      tap(data => {
+        expect(data).toBe('neat');
+        testCache.clearAll();
+        expect(testCache.get('neat')).toBe(undefined);
+        expect(testCache.get('cool')).toBe(undefined);
+      })
+    )
+    .subscribe(() => {}, () => {}, () => done());
+});
+
+test('clearing a non-existing key should return false', done => {
+  const testCache = new InstaCache();
+  expect(testCache.clear('wow')).toBe(false);
+  done();
+});
+
 test('cache observable', done => {
   const testCache = new InstaCache();
   testCache.get('observable', () => of(3)).subscribe(result => {

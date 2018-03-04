@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs/Observable';
-import { get, isFunction } from 'lodash';
+import { get, isFunction, unset, forEach } from 'lodash';
 import { map, share, take, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
@@ -14,10 +14,9 @@ export class InstaCache {
   private cacheEntries: { [key: string]: CacheEntry } = {};
 
   public cache(key: string, generator: () => any): InstaCache {
-    const source = new ReplaySubject(1);
     this.cacheEntries[key] = {
       generator,
-      source,
+      source: new ReplaySubject(1),
       initialized: false
     };
     return this;
@@ -59,6 +58,20 @@ export class InstaCache {
       return true;
     }
     return false;
+  }
+
+  public clear(key: string): boolean {
+    const entry = <CacheEntry>get(this.cacheEntries, key);
+    if (entry) {
+      entry.source.complete();
+      unset(this.cacheEntries, key);
+      return true;
+    }
+    return false;
+  }
+
+  public clearAll() {
+    forEach(this.cacheEntries, (entry, key) => this.clear(key));
   }
 
   private _initialize(entry: CacheEntry, key: string): void {
