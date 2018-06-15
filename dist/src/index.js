@@ -1,10 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Observable_1 = require("rxjs/Observable");
 var lodash_1 = require("lodash");
 var operators_1 = require("rxjs/operators");
-var fromPromise_1 = require("rxjs/observable/fromPromise");
-var ReplaySubject_1 = require("rxjs/ReplaySubject");
+var rxjs_1 = require("rxjs");
 var InstaCache = /** @class */ (function () {
     function InstaCache() {
         this.cacheEntries = {};
@@ -12,17 +10,26 @@ var InstaCache = /** @class */ (function () {
     InstaCache.prototype.cache = function (key, generator) {
         this.cacheEntries[key] = {
             generator: generator,
-            source: new ReplaySubject_1.ReplaySubject(1),
+            source: new rxjs_1.ReplaySubject(1),
             initialized: false
         };
         return this;
     };
+    InstaCache.prototype.isInitialized = function (key) {
+        return lodash_1.get(this.cacheEntries, [key, 'initialized']) === true;
+    };
+    InstaCache.prototype.has = function (key) {
+        return lodash_1.has(this.cacheEntries, key);
+    };
     InstaCache.prototype.get = function (key, miss) {
         var entry = lodash_1.get(this.cacheEntries, key);
         if (entry) {
-            this._initialize(entry, key);
+            if (!entry.initialized) {
+                this.refresh(key);
+                entry.initialized = true;
+            }
             // Create a fresh reference to prevent mutability bugs
-            return entry.source.pipe(operators_1.map(function (x) { return x; }));
+            return entry.source.pipe(operators_1.map(lodash_1.identity));
         }
         else if (miss) {
             return this.cache(key, miss).get(key);
@@ -32,7 +39,7 @@ var InstaCache = /** @class */ (function () {
     InstaCache.prototype.refresh = function (key) {
         var entry = lodash_1.get(this.cacheEntries, key);
         if (entry) {
-            var result = this._toObservable(entry.generator()).pipe(operators_1.take(1), operators_1.tap(function (result) { return entry.source.next(result); }), operators_1.share());
+            var result = this._toObservable(entry.generator()).pipe(operators_1.take(1), operators_1.tap(function (res) { return entry.source.next(res); }), operators_1.tap(function () { return (entry.initialized = true); }), operators_1.share());
             // Make sure the update occurs regardless of caller subscribing
             result.subscribe();
             return result;
@@ -60,18 +67,12 @@ var InstaCache = /** @class */ (function () {
         var _this = this;
         lodash_1.forEach(this.cacheEntries, function (entry, key) { return _this.clear(key); });
     };
-    InstaCache.prototype._initialize = function (entry, key) {
-        if (!entry.initialized) {
-            this.refresh(key);
-            entry.initialized = true;
-        }
-    };
     InstaCache.prototype._toObservable = function (input) {
-        if (input instanceof Observable_1.Observable)
+        if (input instanceof rxjs_1.Observable)
             return input;
         // Promise.resolve will turn values into promises,
         // and will have no effect on existing promises
-        return fromPromise_1.fromPromise(Promise.resolve(input));
+        return rxjs_1.from(Promise.resolve(input));
     };
     return InstaCache;
 }());
