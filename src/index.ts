@@ -1,5 +1,5 @@
 import { identity, get, unset, forEach } from 'lodash';
-import { map, share, take, tap } from 'rxjs/operators';
+import { has, map, share, take, tap } from 'rxjs/operators';
 import { from, Observable, ReplaySubject } from 'rxjs';
 
 interface CacheEntry {
@@ -22,6 +22,10 @@ export class InstaCache {
 
   public isInitialized(key: string): boolean {
     return get(this.cacheEntries, [key, 'initialized']) === true;
+  }
+
+  public has(key: string): boolean {
+    return has(this.cacheEntries, key);
   }
 
   public get(key: string, miss?: () => any): Observable<any> | undefined {
