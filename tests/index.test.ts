@@ -1,10 +1,7 @@
 import { InstaCache } from '../src/index';
-import { of } from 'rxjs/observable/of';
-import { forkJoin } from 'rxjs/observable/forkJoin';
-import { toPromise } from 'rxjs/operator/toPromise';
-import { Observable } from 'rxjs/Observable';
+import { of, Observable } from 'rxjs';
 import { delay, map, mergeMap, take, tap } from 'rxjs/operators';
-import { get, isNumber } from 'lodash';
+import { isNumber } from 'lodash';
 
 declare var test;
 declare var expect;
@@ -64,6 +61,30 @@ test('refresh calls the generator', done => {
       expect(result1).not.toBe(result2);
       done();
     });
+});
+
+test('returns whether a value has been initialized', done => {
+  const testCache = new InstaCache()
+    .cache('cool', () => 'cool')
+    .cache('notcool', () => 'notcool');
+
+  expect(testCache.isInitialized('cool')).toBe(false);
+  expect(testCache.isInitialized('notcool')).toBe(false);
+  expect(testCache.isInitialized('non-existant')).toBe(false);
+
+  testCache.get('cool').subscribe(() => {
+    expect(testCache.isInitialized('cool')).toBe(true);
+    expect(testCache.isInitialized('notcool')).toBe(false);
+    expect(testCache.isInitialized('non-existant')).toBe(false);
+
+    testCache.refresh('notcool').subscribe(() => {
+      expect(testCache.isInitialized('cool')).toBe(true);
+      expect(testCache.isInitialized('notcool')).toBe(true);
+      expect(testCache.isInitialized('non-existant')).toBe(false);
+
+      done();
+    });
+  });
 });
 
 test('update pushs a new value to subscribers', done => {
