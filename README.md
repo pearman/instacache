@@ -13,17 +13,20 @@ npm install --save instacache
 ```
 
 ## Getting Started
-### Initializing the Cache 
 
-The cache is initialized simply with *key* and a *generator*. The *generator* is a lambda returning an Observable, Promise, or value. Internally the value yielded by the *generator* is converted to an Observable. *The `cache` method is lazy*, meaning it will not generate its first result until it is requested with `get`.
+### Initializing the Cache
+
+The cache is initialized simply with _key_ and a _generator_. The _generator_ is a lambda returning an Observable, Promise, or value. Internally the value yielded by the _generator_ is converted to an Observable. _The `cache` method is lazy_, meaning it will not generate its first result until it is requested with `get`.
 
 ```typescript
 // Initialize cache with lazy entries
 const instaCache = new InstaCache()
-    .cache('markets', () =>
-           this.http.get("http://api.bitcoincharts.com/v1/markets.json"))
-    .cache('prices', () =>
-           this.http.get("http://api.bitcoincharts.com/v1/weighted_prices.json"));
+  .cache('markets', () =>
+    this.http.get('http://api.bitcoincharts.com/v1/markets.json')
+  )
+  .cache('prices', () =>
+    this.http.get('http://api.bitcoincharts.com/v1/weighted_prices.json')
+  );
 ```
 
 ### Getting Cached Data
@@ -39,9 +42,11 @@ If race conditions are an issue, or if you want to eagerly retrieve your data, y
 ```typescript
 // If 'markets' does not exist, it will be initialized with the
 // supplied generator.
-instaCache.get('markets', () =>
-  this.http.get('http://api.bitcoincharts.com/v1/markets.json')
-).subscribe(data => console.log(data));
+instaCache
+  .get('markets', () =>
+    this.http.get('http://api.bitcoincharts.com/v1/markets.json')
+  )
+  .subscribe(data => console.log(data));
 ```
 
 If your using **Angular**, you can load values directly in your template using the `async` pipe. Angular will automatically re-render new data if the cache is refreshed.
@@ -52,11 +57,12 @@ If your using **Angular**, you can load values directly in your template using t
 
 ### Refreshing a Cache Entry
 
-To get the latest value yielded by an existing *generator* simply call the refresh method.
+To get the latest value yielded by an existing _generator_ simply call the refresh method.
 
 ```typescript
 instaCache.refresh('markets');
 ```
+
 Note that `refresh` returns an `Observable<any>` so it can be subscribed too if you need the latest result.
 
 ```typescript
@@ -88,27 +94,35 @@ instaCache.clearAll();
 ## Methods
 
 ### cache
+
 ```typescript
 cache(key: string, generator: () => any): InstaCache
 ```
+
 The `cache` method will create a lazy entry in the cache.
 
 ### get
+
 ```typescript
 get(key: string, miss?: () => any): Observable<any> | undefined
 ```
+
 The `get` method will retrieve a key from the cache. If `miss` is supplied, and the key has not been defined, a new entry will be created.
 
 ### refresh
+
 ```typescript
 refresh(key: string): Observable<any> | undefined
 ```
+
 `refresh` will call `key`'s the generator, cache the new result, and broadcast the result to all subscribers.
 
 ### update
+
 ```typescript
 update(key: string, value: any): boolean
 ```
+
 `update` will cache and broadcast to all subscribers for a given `key`. `update` will return `true` if an entry was removed and `false` otherwise.
 
 ### clear
@@ -122,12 +136,23 @@ clear(key: string): boolean
 ### clearAll
 
 ```
-clearAll(): void 
+clearAll(): void
 ```
 
 `clearAll` will complete all subscriptions, for any key, and start fresh.
 
+### isInitialized
 
+```typescript
+isInitialized(key: string): boolean
+```
 
+`isInitialized` will return true if the provided key is both present and the value has been initialized (`get` or `refresh` have been called on the key). This is useful for detecting if calling `get` on a key will return immediately.
 
+### has
 
+```typescript
+has(key: string): boolean
+```
+
+`has` will return true if the provided key is present (regardless of whether or not it is initialized).

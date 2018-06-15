@@ -1,14 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = require("../src/index");
-var of_1 = require("rxjs/observable/of");
-var Observable_1 = require("rxjs/Observable");
+var rxjs_1 = require("rxjs");
 var operators_1 = require("rxjs/operators");
 var lodash_1 = require("lodash");
 test('get of valid key returns observable', function () {
     var testCache = new index_1.InstaCache();
     testCache.cache('value', function () { return 3; });
-    expect(testCache.get('value') instanceof Observable_1.Observable).toBe(true);
+    expect(testCache.get('value') instanceof rxjs_1.Observable).toBe(true);
 });
 test('get of non-existant key returns undefined', function () {
     var testCache = new index_1.InstaCache();
@@ -29,7 +28,7 @@ test('update of existing key returns true', function () {
 });
 test('get with generator will init a key if it does not exist', function (done) {
     var testCache = new index_1.InstaCache();
-    testCache.get('observable', function () { return of_1.of(3); });
+    testCache.get('observable', function () { return rxjs_1.of(3); });
     testCache.get('observable').subscribe(function (result) {
         expect(result).toBe(3);
         done();
@@ -49,6 +48,35 @@ test('refresh calls the generator', function (done) {
         .subscribe(function (_a) {
         var result1 = _a[0], result2 = _a[1];
         expect(result1).not.toBe(result2);
+        done();
+    });
+});
+test('returns whether a value has been initialized', function (done) {
+    var testCache = new index_1.InstaCache()
+        .cache('cool', function () { return 'cool'; })
+        .cache('notcool', function () { return 'notcool'; });
+    expect(testCache.isInitialized('cool')).toBe(false);
+    expect(testCache.isInitialized('notcool')).toBe(false);
+    expect(testCache.isInitialized('non-existant')).toBe(false);
+    testCache.get('cool').subscribe(function () {
+        expect(testCache.isInitialized('cool')).toBe(true);
+        expect(testCache.isInitialized('notcool')).toBe(false);
+        expect(testCache.isInitialized('non-existant')).toBe(false);
+        testCache.refresh('notcool').subscribe(function () {
+            expect(testCache.isInitialized('cool')).toBe(true);
+            expect(testCache.isInitialized('notcool')).toBe(true);
+            expect(testCache.isInitialized('non-existant')).toBe(false);
+            done();
+        });
+    });
+});
+test('returns whether a value exists', function (done) {
+    var testCache = new index_1.InstaCache().cache('cool', function () { return 'cool'; });
+    expect(testCache.has('cool')).toBe(true);
+    expect(testCache.isInitialized('non-existant')).toBe(false);
+    testCache.get('cool').subscribe(function () {
+        expect(testCache.has('cool')).toBe(true);
+        expect(testCache.isInitialized('non-existant')).toBe(false);
         done();
     });
 });
@@ -105,7 +133,7 @@ test('clearing a non-existing key should return false', function (done) {
 });
 test('cache observable', function (done) {
     var testCache = new index_1.InstaCache();
-    testCache.get('observable', function () { return of_1.of(3); }).subscribe(function (result) {
+    testCache.get('observable', function () { return rxjs_1.of(3); }).subscribe(function (result) {
         expect(result).toBe(3);
         done();
     });

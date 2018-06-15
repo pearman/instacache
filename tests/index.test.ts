@@ -87,6 +87,19 @@ test('returns whether a value has been initialized', done => {
   });
 });
 
+test('returns whether a value exists', done => {
+  const testCache = new InstaCache().cache('cool', () => 'cool');
+
+  expect(testCache.has('cool')).toBe(true);
+  expect(testCache.isInitialized('non-existant')).toBe(false);
+
+  testCache.get('cool').subscribe(() => {
+    expect(testCache.has('cool')).toBe(true);
+    expect(testCache.isInitialized('non-existant')).toBe(false);
+    done();
+  });
+});
+
 test('update pushs a new value to subscribers', done => {
   const testCache = new InstaCache();
   const key = 'test';
