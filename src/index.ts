@@ -1,8 +1,6 @@
-import { Observable } from 'rxjs/Observable';
-import { get, isFunction, unset, forEach } from 'lodash';
+import { identity, get, unset, forEach } from 'lodash';
 import { map, share, take, tap } from 'rxjs/operators';
-import { fromPromise } from 'rxjs/observable/fromPromise';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
+import { from, Observable, ReplaySubject } from 'rxjs';
 
 interface CacheEntry {
   generator: () => Observable<any>;
@@ -22,13 +20,20 @@ export class InstaCache {
     return this;
   }
 
+  public isInitialized(key: string): boolean {
+    return get(this.cacheEntries, [key, 'initialized']) === true;
+  }
+
   public get(key: string, miss?: () => any): Observable<any> | undefined {
     const entry = <CacheEntry>get(this.cacheEntries, key);
 
     if (entry) {
-      this._initialize(entry, key);
+      if (!entry.initialized) {
+        this.refresh(key);
+        entry.initialized = true;
+      }
       // Create a fresh reference to prevent mutability bugs
-      return entry.source.pipe(map(x => x));
+      return entry.source.pipe(map(identity));
     } else if (miss) {
       return this.cache(key, miss).get(key);
     }
@@ -41,7 +46,8 @@ export class InstaCache {
     if (entry) {
       const result = this._toObservable(entry.generator()).pipe(
         take(1),
-        tap(result => entry.source.next(result)),
+        tap(res => entry.source.next(res)),
+        tap(() => (entry.initialized = true)),
         share()
       );
       // Make sure the update occurs regardless of caller subscribing
@@ -74,18 +80,11 @@ export class InstaCache {
     forEach(this.cacheEntries, (entry, key) => this.clear(key));
   }
 
-  private _initialize(entry: CacheEntry, key: string): void {
-    if (!entry.initialized) {
-      this.refresh(key);
-      entry.initialized = true;
-    }
-  }
-
   private _toObservable(input: any): Observable<any> {
     if (input instanceof Observable) return input;
 
     // Promise.resolve will turn values into promises,
     // and will have no effect on existing promises
-    return fromPromise(Promise.resolve(input));
+    return from(Promise.resolve(input));
   }
 }
